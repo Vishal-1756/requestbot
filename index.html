@@ -23,24 +23,20 @@
       margin: 20px 0;
     }
     #editor {
-      width: 80%;
-      height: 300px;
+      width: 90%;
+      height: 60vh;
       border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
     .output {
-      width: 80%;
-      height: 200px;
-      background-color: #1e1e1e;
+      width: 90%;
+      height: 40vh;
+      background-color: #282c34;
+      color: #ffffff;
       border-radius: 8px;
       padding: 15px;
       font-size: 16px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      color: #ffffff;
-      margin: 0;
-      box-sizing: border-box;
       overflow-y: auto;
     }
     button {
@@ -61,25 +57,32 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs/loader.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
 </head>
-<body onload="brython()">
+<body onload="init()">
   <h1>Python IDE</h1>
   <div id="editor"></div>
   <button onclick="runCode()"><i class="fas fa-play"></i> Run</button>
   <div class="output" id="output"></div>
 
   <script>
-    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs' }});
-    require(['vs/editor/editor.main'], function() {
-      window.editor = monaco.editor.create(document.getElementById('editor'), {
-        value: 'print("Hello, world!")',
-        language: 'python',
-        theme: 'vs-dark',
-        automaticLayout: true
+    let editor;
+
+    function init() {
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs' }});
+      require(['vs/editor/editor.main'], function() {
+        editor = monaco.editor.create(document.getElementById('editor'), {
+          value: 'print("Hello, world!")',
+          language: 'python',
+          theme: 'vs-dark',
+          automaticLayout: true,
+          minimap: {
+            enabled: false
+          }
+        });
       });
-    });
+    }
 
     function runCode() {
-      const code = window.editor.getValue();
+      const code = editor.getValue();
       const output = document.getElementById('output');
       output.textContent = '';
       try {
