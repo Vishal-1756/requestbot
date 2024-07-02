@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Python IDE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background-color: #282c34;
-      color: #61dafb;
+      background-color: #1e1e1e;
+      color: #ffffff;
       font-family: 'Courier New', Courier, monospace;
       height: 100vh;
       margin: 0;
@@ -21,28 +22,18 @@
     h1 {
       margin: 20px 0;
     }
-    .editor, .output {
+    #editor {
       width: 80%;
-      margin: 10px 0;
-      background-color: #1e1e1e;
+      height: 300px;
       border-radius: 8px;
       overflow: hidden;
+      margin-bottom: 10px;
     }
-    .editor textarea {
-      width: 100%;
+    .output {
+      width: 80%;
       height: 200px;
-      background: none;
-      border: none;
-      color: #ffffff;
-      padding: 15px;
-      font-size: 16px;
-      resize: none;
-      outline: none;
-      box-sizing: border-box;
-    }
-    .output pre {
-      width: 100%;
-      background: none;
+      background-color: #1e1e1e;
+      border-radius: 8px;
       padding: 15px;
       font-size: 16px;
       white-space: pre-wrap;
@@ -50,6 +41,7 @@
       color: #ffffff;
       margin: 0;
       box-sizing: border-box;
+      overflow-y: auto;
     }
     button {
       padding: 10px 20px;
@@ -60,37 +52,51 @@
       border-radius: 8px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin-bottom: 10px;
     }
     button:hover {
       background-color: #21a1f1;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs/loader.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.5/brython.min.js"></script>
 </head>
 <body onload="brython()">
   <h1>Python IDE</h1>
-  <div class="editor">
-    <textarea id="code" placeholder="Write your Python code here...">print("Hello, world!")</textarea>
-  </div>
-  <button onclick="runCode()">Run</button>
-  <div class="output">
-    <pre id="output"></pre>
-  </div>
+  <div id="editor"></div>
+  <button onclick="runCode()"><i class="fas fa-play"></i> Run</button>
+  <div class="output" id="output"></div>
+
+  <script>
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.31.1/min/vs' }});
+    require(['vs/editor/editor.main'], function() {
+      window.editor = monaco.editor.create(document.getElementById('editor'), {
+        value: 'print("Hello, world!")',
+        language: 'python',
+        theme: 'vs-dark',
+        automaticLayout: true
+      });
+    });
+
+    function runCode() {
+      const code = window.editor.getValue();
+      const output = document.getElementById('output');
+      output.textContent = '';
+      try {
+        __BRYTHON__.py2js(code, '__main__').to_js();
+        __BRYTHON__.run_code(code);
+      } catch (e) {
+        output.textContent = e.message;
+      }
+    }
+  </script>
 
   <script type="text/python">
-    from browser import document, window
+    from browser import document
 
-    def runCode(event):
-        code = document['code'].value
+    def print(*args):
         output = document['output']
-        output.text = ''
-        try:
-            exec(code, globals())
-        except Exception as e:
-            output.text = str(e)
-
-    document['runCode'] = runCode
+        output.textContent += ' '.join(str(arg) for arg in args) + '\n'
   </script>
 </body>
 </html>
-
