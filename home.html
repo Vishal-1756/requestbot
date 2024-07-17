@@ -8,7 +8,7 @@
         body {
             background: #000;
             color: #fff;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             display: flex;
             justify-content: center;
@@ -105,14 +105,14 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
             display: inline-block;
-            animation: slideUp 0.5s ease-in-out;
+            width: 300px;
+            text-align: center;
         }
 
         .song-box img {
             border-radius: 10px;
-            max-width: 150px;
+            max-width: 100%;
             margin-bottom: 10px;
-            animation: pulse 1.5s infinite;
         }
 
         .song-box .song-name,
@@ -122,49 +122,39 @@
             font-size: 18px;
         }
 
-        .controls {
+        .control-buttons {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
+            justify-content: space-around;
+            margin-top: 10px;
         }
 
-        .controls button {
-            background: #ff5f55;
+        .control-button {
+            background: none;
             border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 10px;
+            color: #fff;
             cursor: pointer;
-            transition: background 0.3s ease;
+            font-size: 24px;
+            transition: transform 0.2s;
         }
 
-        .controls button:hover {
-            background: #ff8575;
+        .control-button:hover {
+            transform: scale(1.1);
         }
 
-        .controls button span {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            mask: url('play.svg') center / contain no-repeat;
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #555;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+            position: relative;
         }
 
-        .controls button.pause span {
-            mask: url('pause.svg') center / contain no-repeat;
-        }
-
-        .controls button.next span {
-            mask: url('next.svg') center / contain no-repeat;
-        }
-
-        .controls button.prev span {
-            mask: url('prev.svg') center / contain no-repeat;
+        .progress-bar div {
+            height: 100%;
+            background: #ff5f55;
+            width: 0;
         }
 
         @keyframes fadeIn {
@@ -172,43 +162,15 @@
             to { opacity: 1; }
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(20px); }
-            to { transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
         .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #ff5f55;
+            position: absolute;
+            top: 20px;
+            background: #444;
             color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-            text-align: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .popup.active {
-            display: block;
-        }
-
-        .popup button {
-            background: #fff;
-            color: #ff5f55;
-            border: none;
             padding: 10px 20px;
             border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
         }
     </style>
 </head>
@@ -226,33 +188,37 @@
             <div class="song-name" id="song-name"></div>
             <div class="artist-name" id="artist-name"></div>
             <div class="album-name" id="album-name"></div>
-            <div class="controls">
-                <button class="prev" onclick="prevSong();"><span></span></button>
-                <button class="play-pause" onclick="togglePlayPause();"><span></span></button>
-                <button class="next" onclick="nextSong();"><span></span></button>
+            <div class="control-buttons">
+                <button class="control-button" onclick="prevSong()">&#9664;</button>
+                <button class="control-button" id="play-pause-button" onclick="togglePlayPause()">&#9654;</button>
+                <button class="control-button" onclick="nextSong()">&#9654;&#9654;</button>
             </div>
-            <audio id="song-audio" hidden>
-                <source id="song-source" src="" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>
+            <div class="progress-bar" id="progress-bar">
+                <div></div>
+            </div>
         </div>
     </div>
 
-    <div class="popup" id="popup">
-        <p>Please enter a search query.</p>
-        <button onclick="closePopup();">OK</button>
-    </div>
+    <div class="popup" id="popup">Please enter a search query</div>
+
+    <audio id="song-audio">
+        <source id="song-source" src="" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         let currentSongIndex = 0;
         let songs = [];
+        const audioElement = document.getElementById('song-audio');
+        const playPauseButton = document.getElementById('play-pause-button');
+        const progressBar = document.getElementById('progress-bar').firstElementChild;
 
         function searchSong(evt) {
             evt.preventDefault();
             const query = $('.search-input').val();
             if (!query) {
-                showPopup();
+                showPopup('Please enter a search query');
                 return;
             }
 
@@ -260,64 +226,62 @@
                 if (data.success && data.data.results.length > 0) {
                     songs = data.data.results;
                     currentSongIndex = 0;
-                    loadSong();
+                    loadSong(currentSongIndex);
                     $('.search-wrapper').hide();
                     $('#song-details').addClass('active');
                 } else {
-                    alert('No results found.');
+                    showPopup('No results found.');
                 }
             });
         }
 
-        function loadSong() {
-            const song = songs[currentSongIndex];
+        function loadSong(index) {
+            const song = songs[index];
             $('#song-image').attr('src', song.image[1].url);
             $('#song-name').text(song.name);
             $('#artist-name').text(song.artists.primary.map(artist => artist.name).join(', '));
             $('#album-name').text(song.album.name);
             $('#song-source').attr('src', song.downloadUrl[3].url);
-            $('#song-audio')[0].load();
-            $('#song-audio')[0].play();
-            updatePlayPauseButton();
+            audioElement.load();
+            audioElement.play();
+            playPauseButton.innerHTML = '&#10074;&#10074;'; // Pause icon
         }
 
         function togglePlayPause() {
-            const audio = $('#song-audio')[0];
-            if (audio.paused) {
-                audio.play();
+            if (audioElement.paused) {
+                audioElement.play();
+                playPauseButton.innerHTML = '&#10074;&#10074;'; // Pause icon
             } else {
-                audio.pause();
-            }
-            updatePlayPauseButton();
-        }
-
-        function updatePlayPauseButton() {
-            const audio = $('#song-audio')[0];
-            const button = $('.play-pause span');
-            if (audio.paused) {
-                button.css('mask', 'url("play.svg") center / contain no-repeat');
-            } else {
-                button.css('mask', 'url("pause.svg") center / contain no-repeat');
+                audioElement.pause();
+                playPauseButton.innerHTML = '&#9654;'; // Play icon
             }
         }
 
         function nextSong() {
-            currentSongIndex = (currentSongIndex + 1) % songs.length;
-            loadSong();
+            if (currentSongIndex < songs.length - 1) {
+                currentSongIndex++;
+                loadSong(currentSongIndex);
+            }
         }
 
         function prevSong() {
-            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
-            loadSong();
+            if (currentSongIndex > 0) {
+                currentSongIndex--;
+                loadSong(currentSongIndex);
+            }
         }
 
-        function showPopup() {
-            $('#popup').addClass('active');
+        function showPopup(message) {
+            const popup = $('#popup');
+            popup.text(message);
+            popup.show();
+            setTimeout(() => popup.hide(), 3000);
         }
 
-        function closePopup() {
-            $('#popup').removeClass('active');
-        }
+        audioElement.ontimeupdate = function () {
+            const percentage = (audioElement.currentTime / audioElement.duration) * 100;
+            progressBar.style.width = `${percentage}%`;
+        };
     </script>
 </body>
 </html>
