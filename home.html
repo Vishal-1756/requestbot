@@ -50,13 +50,13 @@
         </div>
     </div>
     <script>
-        window.Telegram.WebApp.onEvent('themeChanged', function () {
-            document.body.style.backgroundColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
-        });
-
+        // Ensure the Telegram Web App is initialized
         window.Telegram.WebApp.ready();
 
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded and parsed');
+            console.log('Telegram WebApp initDataUnsafe:', window.Telegram.WebApp.initDataUnsafe);
+
             const user = window.Telegram.WebApp.initDataUnsafe.user;
 
             if (user) {
@@ -67,6 +67,11 @@
                 document.getElementById('user-name').textContent = 'No user data available';
                 document.getElementById('user-id').textContent = '';
             }
+        });
+
+        // Handle theme changes
+        window.Telegram.WebApp.onEvent('themeChanged', function () {
+            document.body.style.backgroundColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
         });
     </script>
 </body>
