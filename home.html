@@ -50,34 +50,23 @@
         </div>
     </div>
     <script>
+        window.Telegram.WebApp.onEvent('themeChanged', function () {
+            document.body.style.backgroundColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
+        });
+
+        window.Telegram.WebApp.ready();
+
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait until the Telegram WebApp is fully initialized
-            window.Telegram.WebApp.ready();
+            const user = window.Telegram.WebApp.initDataUnsafe.user;
 
-            // Debugging: Check if Telegram WebApp is ready
-            console.log('Telegram WebApp is ready');
-
-            // Get user data from Telegram WebApp
-            const initDataUnsafe = window.Telegram.WebApp.initDataUnsafe;
-            console.log('initDataUnsafe:', initDataUnsafe);
-
-            // Check if user data exists
-            const user = initDataUnsafe.user;
             if (user) {
-                console.log('User data:', user);
-                document.getElementById('profile-pic').src = user.photo_url || 'default-profile-pic.jpg'; // Provide a default profile picture
+                document.getElementById('profile-pic').src = user.photo_url;
                 document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
                 document.getElementById('user-id').textContent = `ID: ${user.id}`;
             } else {
-                console.log('No user data available');
                 document.getElementById('user-name').textContent = 'No user data available';
                 document.getElementById('user-id').textContent = '';
             }
-
-            // Handle theme changes
-            window.Telegram.WebApp.onEvent('themeChanged', function () {
-                document.body.style.backgroundColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
-            });
         });
     </script>
 </body>
