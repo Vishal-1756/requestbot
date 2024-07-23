@@ -31,6 +31,24 @@
         #user-id {
             color: #888;
         }
+
+        #logs {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -39,10 +57,21 @@
             <h2 id="user-name">User Name</h2>
             <p id="user-id">User ID</p>
         </div>
+        <div id="logs"></div>
     </div>
     <script>
+        function addLog(message) {
+            const logContainer = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+        }
+
         window.Telegram.WebApp.onEvent('themeChanged', function () {
-            document.body.style.backgroundColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
+            const newColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
+            document.body.style.backgroundColor = newColor;
+            addLog(`Theme changed to: ${window.Telegram.WebApp.colorScheme}`);
         });
 
         window.Telegram.WebApp.ready();
@@ -50,14 +79,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             const user = window.Telegram.WebApp.initDataUnsafe.user;
 
-            console.log('User data:', user); // Print user data to console
+            addLog('User data loaded');
 
             if (user) {
                 document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
                 document.getElementById('user-id').textContent = `ID: ${user.id}`;
+                addLog(`User name: ${user.first_name} ${user.last_name}`);
+                addLog(`User ID: ${user.id}`);
             } else {
                 document.getElementById('user-name').textContent = 'No user data available';
                 document.getElementById('user-id').textContent = '';
+                addLog('No user data available');
             }
         });
     </script>
