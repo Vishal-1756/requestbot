@@ -12,67 +12,69 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #000;
+            overflow: hidden;
         }
 
         .container {
             text-align: center;
-            background: #fff;
+            background: #222;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .ambient-light {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+            border-radius: 8px;
+            animation: moveLight 2s infinite;
+        }
+
+        @keyframes moveLight {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            50% { transform: translateX(100%) translateY(100%); }
+            100% { transform: translateX(-100%) translateY(-100%); }
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 20px;
         }
 
         #user-name {
             font-size: 24px;
             margin: 0;
+            color: #fff;
         }
 
         #user-id {
-            color: #888;
-        }
-
-        #logs {
-            margin-top: 20px;
-            text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
-            background: #f9f9f9;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 100%;
-        }
-
-        .log-entry {
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: #555;
+            color: #bbb;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="ambient-light"></div>
         <div class="profile">
+            <img id="profile-pic" src="" alt="Profile Picture">
             <h2 id="user-name">User Name</h2>
             <p id="user-id">User ID</p>
         </div>
-        <div id="logs"></div>
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        function addLog(message) {
-            const logContainer = document.getElementById('logs');
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            logEntry.textContent = message;
-            logContainer.appendChild(logEntry);
-        }
-
         window.Telegram.WebApp.onEvent('themeChanged', function () {
-            const newColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#1a1a1a' : '#f0f0f0';
+            const newColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#000' : '#f0f0f0';
             document.body.style.backgroundColor = newColor;
-            addLog(`Theme changed to: ${window.Telegram.WebApp.colorScheme}`);
         });
 
         window.Telegram.WebApp.ready();
@@ -80,17 +82,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const user = window.Telegram.WebApp.initDataUnsafe.user;
 
-            addLog('User data loaded');
-
             if (user) {
+                document.getElementById('profile-pic').src = user.photo_url;
                 document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
                 document.getElementById('user-id').textContent = `ID: ${user.id}`;
-                addLog(`User name: ${user.first_name} ${user.last_name}`);
-                addLog(`User ID: ${user.id}`);
             } else {
                 document.getElementById('user-name').textContent = 'No user data available';
                 document.getElementById('user-id').textContent = '';
-                addLog('No user data available');
             }
         });
     </script>
