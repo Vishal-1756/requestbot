@@ -23,14 +23,6 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .profile img {
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            margin-bottom: 20px;
-        }
-
         #user-name {
             font-size: 24px;
             margin: 0;
@@ -44,7 +36,6 @@
 <body>
     <div class="container">
         <div class="profile">
-            <img id="profile-pic" src="" alt="Profile Picture">
             <h2 id="user-name">User Name</h2>
             <p id="user-id">User ID</p>
         </div>
@@ -59,8 +50,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             const user = window.Telegram.WebApp.initDataUnsafe.user;
 
+            console.log('User data:', user); // Print user data to console
+
             if (user) {
-                document.getElementById('profile-pic').src = user.photo_url;
                 document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
                 document.getElementById('user-id').textContent = `ID: ${user.id}`;
             } else {
