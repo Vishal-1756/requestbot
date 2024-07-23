@@ -31,6 +31,9 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border: 2px solid;
             animation: glowing 3s infinite;
+            width: 90%;
+            max-width: 400px;
+            margin: 0 20px;
         }
 
         #user-name {
@@ -45,10 +48,17 @@
 
         .profile img {
             border-radius: 50%;
-            width: 150px;
-            height: 150px;
+            width: 100px;
+            height: 100px;
             object-fit: cover;
             margin-bottom: 20px;
+        }
+
+        @media (min-width: 600px) {
+            .profile img {
+                width: 150px;
+                height: 150px;
+            }
         }
     </style>
 </head>
