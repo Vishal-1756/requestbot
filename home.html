@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Web App</title>
     <style>
+        @keyframes glowing {
+            0% { border-color: red; }
+            25% { border-color: yellow; }
+            50% { border-color: lime; }
+            75% { border-color: cyan; }
+            100% { border-color: red; }
+        }
+
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -13,7 +21,6 @@
             height: 100vh;
             margin: 0;
             background-color: #000;
-            overflow: hidden;
         }
 
         .container {
@@ -21,25 +28,19 @@
             background: #222;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid;
+            animation: glowing 3s infinite;
         }
 
-        .ambient-light {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-            border-radius: 8px;
-            animation: moveLight 2s infinite;
+        #user-name {
+            font-size: 24px;
+            color: #fff;
+            margin: 0;
         }
 
-        @keyframes moveLight {
-            0% { transform: translateX(-100%) translateY(-100%); }
-            50% { transform: translateX(100%) translateY(100%); }
-            100% { transform: translateX(-100%) translateY(-100%); }
+        #user-id {
+            color: #888;
         }
 
         .profile img {
@@ -49,21 +50,10 @@
             object-fit: cover;
             margin-bottom: 20px;
         }
-
-        #user-name {
-            font-size: 24px;
-            margin: 0;
-            color: #fff;
-        }
-
-        #user-id {
-            color: #bbb;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="ambient-light"></div>
         <div class="profile">
             <img id="profile-pic" src="" alt="Profile Picture">
             <h2 id="user-name">User Name</h2>
@@ -72,20 +62,32 @@
     </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        window.Telegram.WebApp.onEvent('themeChanged', function () {
-            const newColor = window.Telegram.WebApp.colorScheme === 'dark' ? '#000' : '#f0f0f0';
-            document.body.style.backgroundColor = newColor;
-        });
-
         window.Telegram.WebApp.ready();
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const user = window.Telegram.WebApp.initDataUnsafe.user;
 
             if (user) {
-                document.getElementById('profile-pic').src = user.photo_url;
                 document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
                 document.getElementById('user-id').textContent = `ID: ${user.id}`;
+
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot7097177949:AAHEj6aYE6gk-qoqPD8HhhLJ3awkbjLumZA/getUserProfilePhotos?user_id=${user.id}`);
+                    const data = await response.json();
+
+                    if (data.ok && data.result.total_count > 0) {
+                        const photo = data.result.photos[0][0];
+                        const fileResponse = await fetch(`https://api.telegram.org/bot7097177949:AAHEj6aYE6gk-qoqPD8HhhLJ3awkbjLumZA/getFile?file_id=${photo.file_id}`);
+                        const fileData = await fileResponse.json();
+
+                        if (fileData.ok) {
+                            const fileUrl = `https://api.telegram.org/file/bot7097177949:AAHEj6aYE6gk-qoqPD8HhhLJ3awkbjLumZA/${fileData.result.file_path}`;
+                            document.getElementById('profile-pic').src = fileUrl;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching profile photo:', error);
+                }
             } else {
                 document.getElementById('user-name').textContent = 'No user data available';
                 document.getElementById('user-id').textContent = '';
