@@ -46,7 +46,7 @@
             color: #888;
         }
 
-        .profile img, .profile video {
+        .profile img {
             border-radius: 50%;
             width: 100px;
             height: 100px;
@@ -55,7 +55,7 @@
         }
 
         @media (min-width: 600px) {
-            .profile img, .profile video {
+            .profile img {
                 width: 150px;
                 height: 150px;
             }
@@ -65,8 +65,7 @@
 <body>
     <div class="container">
         <div class="profile">
-            <img id="profile-pic" src="" alt="Profile Picture" style="display: none;">
-            <video id="profile-video" controls style="display: none;"></video>
+            <img id="profile-pic" src="" alt="Profile Picture">
             <h2 id="user-name">User Name</h2>
             <p id="user-id">User ID</p>
         </div>
@@ -93,15 +92,7 @@
 
                         if (fileData.ok) {
                             const fileUrl = `https://api.telegram.org/file/bot7097177949:AAHEj6aYE6gk-qoqPD8HhhLJ3awkbjLumZA/${fileData.result.file_path}`;
-                            const fileExt = fileUrl.split('.').pop().toLowerCase();
-
-                            if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExt)) {
-                                document.getElementById('profile-video').src = fileUrl;
-                                document.getElementById('profile-video').style.display = 'block';
-                            } else {
-                                document.getElementById('profile-pic').src = fileUrl;
-                                document.getElementById('profile-pic').style.display = 'block';
-                            }
+                            document.getElementById('profile-pic').src = fileUrl;
                         }
                     }
                 } catch (error) {
