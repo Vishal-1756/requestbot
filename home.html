@@ -29,11 +29,27 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border: 2px solid;
-            animation: glowing 3s infinite;
             width: 90%;
             max-width: 400px;
             margin: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%;
+            z-index: -1;
+            filter: blur(5px);
+            opacity: 0.5;
+            animation: glowing 20s linear infinite;
+            border-radius: 8px;
         }
 
         #user-name {
@@ -95,17 +111,12 @@
             const userId = params.get('id');
             const firstName = params.get('first_name');
             const lastName = params.get('last_name');
-            const photoUrl = params.get('photo_url');
 
             if (userId && firstName && lastName) {
                 document.getElementById('user-name').textContent = `${firstName} ${lastName}`;
                 document.getElementById('user-id').textContent = `ID: ${userId}`;
 
-                let profilePhotoUrl = photoUrl;
-                if (!profilePhotoUrl) {
-                    profilePhotoUrl = await fetchProfilePhoto(userId);
-                }
-
+                const profilePhotoUrl = await fetchProfilePhoto(userId);
                 if (profilePhotoUrl) {
                     document.getElementById('profile-pic').src = profilePhotoUrl;
                 } else {
