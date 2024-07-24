@@ -78,10 +78,24 @@
             100% { background-position: 0 0; }
         }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        function goToProfile() {
+            const user = window.Telegram.WebApp.initDataUnsafe.user;
+            const url = new URL('home.html', window.location.origin);
+            url.searchParams.set('id', user.id);
+            url.searchParams.set('first_name', user.first_name);
+            url.searchParams.set('last_name', user.last_name);
+            url.searchParams.set('photo_url', user.photo_url || '');
+            window.location.href = url.toString();
+        }
+
+        window.Telegram.WebApp.ready();
+    </script>
 </head>
 <body>
 
-    <button class="glow-on-hover" type="button" onclick="window.location.href='home.html'">Profile</button>
+    <button class="glow-on-hover" type="button" onclick="goToProfile()">Profile</button>
 
 </body>
 </html>
