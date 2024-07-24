@@ -49,7 +49,7 @@
         }
 
         .glow-on-hover:active {
-            color: #000
+            color: #000;
         }
 
         .glow-on-hover:active:after {
@@ -80,22 +80,24 @@
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        function goToProfile() {
+        function redirectToProfile() {
             const user = window.Telegram.WebApp.initDataUnsafe.user;
-            const url = new URL('home.html', window.location.origin);
-            url.searchParams.set('id', user.id);
-            url.searchParams.set('first_name', user.first_name);
-            url.searchParams.set('last_name', user.last_name);
-            url.searchParams.set('photo_url', user.photo_url || '');
-            window.location.href = url.toString();
+            if (user) {
+                const url = new URL('home.html', window.location.origin);
+                url.searchParams.set('id', user.id);
+                url.searchParams.set('first_name', user.first_name);
+                url.searchParams.set('last_name', user.last_name);
+                url.searchParams.set('photo_url', user.photo_url || '');
+                window.location.href = url.toString();
+            } else {
+                alert('User data is not available.');
+            }
         }
 
         window.Telegram.WebApp.ready();
     </script>
 </head>
 <body>
-
-    <button class="glow-on-hover" type="button" onclick="goToProfile()">Profile</button>
-
+    <button class="glow-on-hover" type="button" onclick="redirectToProfile()">Profile</button>
 </body>
 </html>
