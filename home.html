@@ -71,24 +71,43 @@
         </div>
     </div>
     <script>
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                id: params.get('id'),
-                first_name: params.get('first_name'),
-                last_name: params.get('last_name'),
-                photo_url: params.get('photo_url')
-            };
+        async function fetchProfilePhoto(userId) {
+            const botToken = '7097177949:AAHEj6aYE6gk-qoqPD8HhhLJ3awkbjLumZA';
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos?user_id=${userId}`);
+                const data = await response.json();
+                if (data.ok && data.result.total_count > 0) {
+                    const photo = data.result.photos[0][0];
+                    const fileResponse = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${photo.file_id}`);
+                    const fileData = await fileResponse.json();
+                    if (fileData.ok) {
+                        return `https://api.telegram.org/file/bot${botToken}/${fileData.result.file_path}`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching profile photo:', error);
+            }
+            return null;
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = getQueryParams();
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get('id');
+            const firstName = params.get('first_name');
+            const lastName = params.get('last_name');
+            const photoUrl = params.get('photo_url');
 
-            if (user) {
-                document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
-                document.getElementById('user-id').textContent = `ID: ${user.id}`;
-                if (user.photo_url) {
-                    document.getElementById('profile-pic').src = user.photo_url;
+            if (userId && firstName && lastName) {
+                document.getElementById('user-name').textContent = `${firstName} ${lastName}`;
+                document.getElementById('user-id').textContent = `ID: ${userId}`;
+
+                let profilePhotoUrl = photoUrl;
+                if (!profilePhotoUrl) {
+                    profilePhotoUrl = await fetchProfilePhoto(userId);
+                }
+
+                if (profilePhotoUrl) {
+                    document.getElementById('profile-pic').src = profilePhotoUrl;
                 }
             } else {
                 document.getElementById('user-name').textContent = 'No user data available';
