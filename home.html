@@ -108,10 +108,13 @@
 
                 if (profilePhotoUrl) {
                     document.getElementById('profile-pic').src = profilePhotoUrl;
+                } else {
+                    document.getElementById('profile-pic').alt = 'No profile picture available';
                 }
             } else {
                 document.getElementById('user-name').textContent = 'No user data available';
                 document.getElementById('user-id').textContent = '';
+                document.getElementById('profile-pic').alt = 'No profile picture available';
             }
         });
     </script>
