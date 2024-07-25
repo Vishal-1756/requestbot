@@ -3,80 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doraemon</title>
+    <title>Motion Sensing Eyes</title>
     <style>
-        html,
-        body {
+        body, html {
+            height: 100%;
             margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #000;
+            background-color: #f0f0f0;
+            cursor: none; /* Hide the cursor for better visual */
         }
-
-        .glow-on-hover {
-            width: 220px;
-            height: 50px;
-            border: none;
-            outline: none;
-            color: #fff;
-            background: #111;
-            cursor: pointer;
+        .eyes {
+            display: flex;
+            gap: 50px;
+        }
+        .eye {
+            width: 100px;
+            height: 150px;
+            background: white;
+            border: 4px solid black;
+            border-radius: 50% / 60%;
             position: relative;
-            z-index: 0;
-            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
         }
-
-        .glow-on-hover:before {
-            content: '';
+        .pupil {
+            width: 30px;
+            height: 40px;
+            background: black;
+            border-radius: 50%;
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-            background-size: 400%;
-            z-index: -1;
-            filter: blur(5px);
-            opacity: 0;
-            transition: opacity .3s ease-in-out;
-            animation: glowing 10s linear infinite;
-            border-radius: 10px;
+            transition: transform 0.05s ease; /* Faster movement for more natural look */
         }
-
-        .glow-on-hover:hover:before {
-            opacity: 1;
-        }
-
-        @keyframes glowing {
-            0% { background-position: 0 0; }
-            50% { background-position: 200% 0; }
-            100% { background-position: 0 0; }
+        .tap {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: red;
+            border-radius: 50%;
+            display: none;
+            pointer-events: none;
         }
     </style>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        function redirectToProfile() {
-            const user = window.Telegram.WebApp.initDataUnsafe.user;
-            if (user) {
-                const url = new URL('home.html', window.location.origin);
-                url.searchParams.set('id', user.id);
-                url.searchParams.set('first_name', user.first_name);
-                url.searchParams.set('last_name', user.last_name);
-                window.location.href = url.toString();
-            } else {
-                alert('User data is not available.');
-            }
-        }
-
-        window.Telegram.WebApp.ready();
-    </script>
 </head>
 <body>
-    <button class="glow-on-hover" type="button" onclick="redirectToProfile()">Profile</button>
+    <div class="eyes">
+        <div class="eye">
+            <div class="pupil" id="left-pupil"></div>
+        </div>
+        <div class="eye">
+            <div class="pupil" id="right-pupil"></div>
+        </div>
+    </div>
+    <div class="tap" id="tap"></div>
+
+    <script>
+        const pupils = document.querySelectorAll('.pupil');
+        const tapIndicator = document.getElementById('tap');
+
+        document.addEventListener("mousemove", (event) => {
+            const { clientX: mouseX, clientY: mouseY } = event;
+            pupils.forEach(pupil => {
+                const { left, top, width, height } = pupil.parentElement.getBoundingClientRect();
+                const eyeX = left + width / 2;
+                const eyeY = top + height / 2;
+                const angle = Math.atan2(mouseY - eyeY, mouseX - eyeX);
+                const maxMovementX = width / 4 - 10; // Limit movement
+                const maxMovementY = height / 4 - 10;
+                const x = Math.cos(angle) * maxMovementX;
+                const y = Math.sin(angle) * maxMovementY;
+                pupil.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+
+        document.addEventListener("click", (event) => {
+            tapIndicator.style.left = `${event.clientX - 5}px`;
+            tapIndicator.style.top = `${event.clientY - 5}px`;
+            tapIndicator.style.display = 'block';
+            setTimeout(() => {
+                tapIndicator.style.display = 'none';
+            }, 300);
+        });
+    </script>
 </body>
 </html>
