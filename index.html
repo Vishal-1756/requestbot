@@ -98,52 +98,83 @@
             margin-top: 4px;
         }
 
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            margin-top: 20px;
+        .up-next-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background-color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
         }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
+        .up-next-container:hover {
             background-color: #333;
-            color: white;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 5px;
-            overflow: hidden;
         }
 
-        .dropdown-content a {
-            color: white;
-            padding: 12px 16px;
-            text-decoration: none;
+        .up-next-container::after {
+            content: "";
             display: block;
+            width: 50px;
+            height: 4px;
+            background-color: #888;
+            border-radius: 2px;
+            margin-top: 5px;
+        }
+
+        .up-next-title {
+            font-size: 16px;
+            color: white;
+        }
+
+        .up-next-list {
+            position: fixed;
+            bottom: -200px;
+            left: 0;
+            width: 100%;
+            background-color: #333;
+            max-height: 300px;
+            overflow-y: auto;
+            transition: bottom 0.3s ease;
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .up-next-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border-bottom: 1px solid #444;
             transition: background-color 0.2s ease;
         }
 
-        .dropdown-content a:hover {
-            background-color: #575757;
-        }
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-
-        .dropdown:hover .dropbtn {
+        .up-next-item:hover {
             background-color: #444;
         }
 
-        .dropbtn {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
+        .up-next-item img {
+            width: 50px;
+            height: 50px;
             border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .up-next-item .info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .up-next-item .info .song-title {
+            font-size: 16px;
+            color: white;
+        }
+
+        .up-next-item .info .artist-name {
+            font-size: 14px;
+            color: #aaa;
         }
     </style>
 </head>
@@ -168,12 +199,30 @@
             <span id="total-time">0:00</span>
         </div>
     </div>
-    <div class="dropdown">
-        <button class="dropbtn">Up Next</button>
-        <div class="dropdown-content">
-            <a href="#">Song 1</a>
-            <a href="#">Song 2</a>
-            <a href="#">Song 3</a>
+    <div class="up-next-container" onclick="toggleUpNext()">
+        <div class="up-next-title">Up Next</div>
+    </div>
+    <div id="up-next-list" class="up-next-list">
+        <div class="up-next-item">
+            <img src="https://c.saavncdn.com/479/The-Beginning-Cupid-Korean-2023-20240324231451-500x500.jpg" alt="Song Image">
+            <div class="info">
+                <div class="song-title">Cupid</div>
+                <div class="artist-name">Fifty Fifty</div>
+            </div>
+        </div>
+        <div class="up-next-item">
+            <img src="https://c.saavncdn.com/479/The-Beginning-Cupid-Korean-2023-20240324231451-500x500.jpg" alt="Song Image">
+            <div class="info">
+                <div class="song-title">Cupid 2</div>
+                <div class="artist-name">Fifty Fifty</div>
+            </div>
+        </div>
+        <div class="up-next-item">
+            <img src="https://c.saavncdn.com/479/The-Beginning-Cupid-Korean-2023-20240324231451-500x500.jpg" alt="Song Image">
+            <div class="info">
+                <div class="song-title">Cupid 3</div>
+                <div class="artist-name">Fifty Fifty</div>
+            </div>
         </div>
     </div>
     <script>
@@ -204,7 +253,7 @@
             document.querySelector('.button-container').classList.remove('active');
             document.querySelector('.song-info').classList.add('active');
             document.querySelector('.audio-player').classList.add('active');
-            document.querySelector('.dropdown').classList.add('active');
+            document.querySelector('.up-next-container').classList.add('active');
             fetchSongDetails();
         }
 
@@ -229,6 +278,15 @@
             const totalMinutes = Math.floor(audio.duration / 60);
             const totalSeconds = Math.floor(audio.duration % 60);
             totalTime.textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
+        }
+
+        function toggleUpNext() {
+            const upNextList = document.getElementById('up-next-list');
+            if (upNextList.style.bottom === '0px') {
+                upNextList.style.bottom = '-200px';
+            } else {
+                upNextList.style.bottom = '0px';
+            }
         }
     </script>
 </body>
