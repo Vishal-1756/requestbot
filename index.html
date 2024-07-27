@@ -91,7 +91,7 @@
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
-            <audio id="audio-player"></audio>
+            <audio id="audio-player" controls style="display: none;"></audio>
         </div>
         <div id="logger"></div>
     </div>
@@ -123,6 +123,7 @@
 
                             const audioPlayer = document.getElementById('audio-player');
                             audioPlayer.src = data.Url;
+                            audioPlayer.style.display = 'block'; // Display audio player
 
                             audioPlayer.oncanplaythrough = () => {
                                 logMessage('Audio can play through.');
