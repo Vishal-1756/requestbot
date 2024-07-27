@@ -101,80 +101,75 @@
         .up-next-container {
             position: fixed;
             bottom: 0;
-            left: 0;
             width: 100%;
-            height: 40px;
-            background-color: #222;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            max-width: 400px;
+            background-color: #000;
+            border-radius: 20px 20px 0 0;
+            transition: transform 0.3s ease-in-out;
+            transform: translateY(100%);
+            z-index: 10;
+        }
+
+        .up-next-header {
+            padding: 15px;
+            text-align: center;
+            background-color: #111;
+            border-radius: 20px 20px 0 0;
             cursor: pointer;
         }
 
-        .up-next-container:hover {
-            background-color: #333;
-        }
-
-        .up-next-container::after {
-            content: "";
+        .up-next-header:after {
+            content: '';
             display: block;
-            width: 50px;
+            width: 40px;
             height: 4px;
-            background-color: #888;
+            background-color: #ccc;
             border-radius: 2px;
-            margin-top: 5px;
+            margin: 10px auto 0;
         }
 
-        .up-next-title {
-            font-size: 16px;
-            color: white;
-        }
-
-        .up-next-list {
-            position: fixed;
-            bottom: -200px;
-            left: 0;
-            width: 100%;
-            background-color: #333;
+        .up-next-content {
+            padding: 20px;
             max-height: 300px;
             overflow-y: auto;
-            transition: bottom 0.3s ease;
-            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.5);
-            z-index: 10;
         }
 
         .up-next-item {
             display: flex;
             align-items: center;
-            padding: 10px 15px;
-            border-bottom: 1px solid #444;
-            transition: background-color 0.2s ease;
-        }
-
-        .up-next-item:hover {
-            background-color: #444;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
         }
 
         .up-next-item img {
             width: 50px;
             height: 50px;
             border-radius: 5px;
-            margin-right: 10px;
+            object-fit: cover;
+            margin-right: 15px;
         }
 
-        .up-next-item .info {
-            display: flex;
-            flex-direction: column;
+        .up-next-item .song-details {
+            flex: 1;
         }
 
-        .up-next-item .info .song-title {
-            font-size: 16px;
+        .up-next-item .song-details p {
+            margin: 0;
+            color: #ccc;
+        }
+
+        .up-next-item .song-details p.song-name {
             color: white;
         }
 
-        .up-next-item .info .artist-name {
-            font-size: 14px;
-            color: #aaa;
+        .up-next-item .song-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .up-next-item .song-actions i {
+            margin-left: 10px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -199,30 +194,34 @@
             <span id="total-time">0:00</span>
         </div>
     </div>
-    <div class="up-next-container" onclick="toggleUpNext()">
-        <div class="up-next-title">Up Next</div>
-    </div>
-    <div id="up-next-list" class="up-next-list">
-        <div class="up-next-item">
-            <img src="https://c.saavncdn.com/479/The-Beginning-Cupid-Korean-2023-20240324231451-500x500.jpg" alt="Song Image">
-            <div class="info">
-                <div class="song-title">Cupid</div>
-                <div class="artist-name">Fifty Fifty</div>
-            </div>
+    <div class="up-next-container" id="up-next-container">
+        <div class="up-next-header" onclick="toggleUpNext()">
+            Up Next
         </div>
-        <div class="up-next-item">
-            <img src="https://c.saavncdn.com/479/The-Beginning-Cupid-Korean-2023-20240324231451-500x500.jpg" alt="Song Image">
-            <div class="info">
-                <div class="song-title">Cupid 2</div>
-                <div class="artist-name">Fifty Fifty</div>
+        <div class="up-next-content">
+            <div class="up-next-item">
+                <img src="https://via.placeholder.com/50" alt="Song Image">
+                <div class="song-details">
+                    <p class="song-name">Song 1</p>
+                    <p>Artist 1</p>
+                </div>
+                <div class="song-actions">
+                    <i class="heart">&#x2665;</i>
+                    <i class="download">&#x1F4E5;</i>
+                </div>
             </div>
-        </div>
-        <div class="up-next-item">
-            <img src="https://c.saavncdn.com/479/The-Beginning-Cupid-Korean-2023-20240324231451-500x500.jpg" alt="Song Image">
-            <div class="info">
-                <div class="song-title">Cupid 3</div>
-                <div class="artist-name">Fifty Fifty</div>
+            <div class="up-next-item">
+                <img src="https://via.placeholder.com/50" alt="Song Image">
+                <div class="song-details">
+                    <p class="song-name">Song 2</p>
+                    <p>Artist 2</p>
+                </div>
+                <div class="song-actions">
+                    <i class="heart">&#x2665;</i>
+                    <i class="download">&#x1F4E5;</i>
+                </div>
             </div>
+            <!-- Add more items as needed -->
         </div>
     </div>
     <script>
@@ -253,7 +252,7 @@
             document.querySelector('.button-container').classList.remove('active');
             document.querySelector('.song-info').classList.add('active');
             document.querySelector('.audio-player').classList.add('active');
-            document.querySelector('.up-next-container').classList.add('active');
+            document.getElementById('up-next-container').style.transform = 'translateY(0)';
             fetchSongDetails();
         }
 
@@ -281,11 +280,11 @@
         }
 
         function toggleUpNext() {
-            const upNextList = document.getElementById('up-next-list');
-            if (upNextList.style.bottom === '0px') {
-                upNextList.style.bottom = '-200px';
+            const upNextContainer = document.getElementById('up-next-container');
+            if (upNextContainer.style.transform === 'translateY(0px)') {
+                upNextContainer.style.transform = 'translateY(100%)';
             } else {
-                upNextList.style.bottom = '0px';
+                upNextContainer.style.transform = 'translateY(0)';
             }
         }
     </script>
