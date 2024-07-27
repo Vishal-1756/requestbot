@@ -97,19 +97,24 @@
                     const audioPlayer = document.getElementById('audio-player');
                     audioPlayer.src = data.Url;
 
-                    audioPlayer.onloadedmetadata = () => {
-                        document.getElementById('progress-bar').style.transition = `width ${audioPlayer.duration}s linear`;
+                    audioPlayer.oncanplaythrough = () => {
                         audioPlayer.play();
+                        document.getElementById('song-details').style.display = 'block';
+                        startProgressBar(audioPlayer);
                     };
 
-                    audioPlayer.ontimeupdate = () => {
-                        const progressBar = document.getElementById('progress-bar');
-                        progressBar.style.width = `${(audioPlayer.currentTime / audioPlayer.duration) * 100}%`;
+                    audioPlayer.onerror = () => {
+                        console.error('Error loading audio');
                     };
-
-                    document.getElementById('song-details').style.display = 'block';
                 })
                 .catch(error => console.error('Error fetching song data:', error));
+        }
+
+        function startProgressBar(audio) {
+            const progressBar = document.getElementById('progress-bar');
+            audio.addEventListener('timeupdate', () => {
+                progressBar.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+            });
         }
     </script>
 </body>
