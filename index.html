@@ -48,12 +48,7 @@
         .progress-bar {
             height: 10px;
             background: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8);
-            animation: progress 0s linear forwards;
-        }
-
-        @keyframes progress {
-            0% { width: 0; }
-            100% { width: 100%; }
+            width: 0;
         }
 
         .join-room-btn {
@@ -64,6 +59,7 @@
             cursor: pointer;
             color: #fff;
             font-size: 16px;
+            margin-top: 20px;
         }
 
         .join-room-btn:hover {
@@ -83,7 +79,7 @@
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
-            <audio id="audio-player" style="display:none;"></audio>
+            <audio id="audio-player"></audio>
         </div>
     </div>
 
@@ -100,11 +96,15 @@
 
                     const audioPlayer = document.getElementById('audio-player');
                     audioPlayer.src = data.Url;
-                    audioPlayer.play();
 
-                    audioPlayer.onloadedmetadata = function() {
-                        document.getElementById('progress-bar').style.animationDuration = `${audioPlayer.duration}s`;
-                        document.getElementById('progress-bar').style.animationPlayState = 'running';
+                    audioPlayer.onloadedmetadata = () => {
+                        document.getElementById('progress-bar').style.transition = `width ${audioPlayer.duration}s linear`;
+                        audioPlayer.play();
+                    };
+
+                    audioPlayer.ontimeupdate = () => {
+                        const progressBar = document.getElementById('progress-bar');
+                        progressBar.style.width = `${(audioPlayer.currentTime / audioPlayer.duration) * 100}%`;
                     };
 
                     document.getElementById('song-details').style.display = 'block';
