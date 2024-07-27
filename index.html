@@ -19,7 +19,8 @@
 
         .button-container,
         .song-info,
-        .audio-player {
+        .audio-player,
+        .up-next-button {
             display: none;
         }
 
@@ -98,6 +99,18 @@
             margin-top: 4px;
         }
 
+        .up-next-button {
+            margin-top: 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            outline: none;
+        }
+
         .up-next-container {
             position: fixed;
             bottom: 0;
@@ -161,16 +174,6 @@
         .up-next-item .song-details p.song-name {
             color: white;
         }
-
-        .up-next-item .song-actions {
-            display: flex;
-            align-items: center;
-        }
-
-        .up-next-item .song-actions i {
-            margin-left: 10px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -194,6 +197,7 @@
             <span id="total-time">0:00</span>
         </div>
     </div>
+    <button class="up-next-button" onclick="toggleUpNext()">Up Next</button>
     <div class="up-next-container" id="up-next-container">
         <div class="up-next-header" onclick="toggleUpNext()">
             Up Next
@@ -205,20 +209,12 @@
                     <p class="song-name">Song 1</p>
                     <p>Artist 1</p>
                 </div>
-                <div class="song-actions">
-                    <i class="heart">&#x2665;</i>
-                    <i class="download">&#x1F4E5;</i>
-                </div>
             </div>
             <div class="up-next-item">
                 <img src="https://via.placeholder.com/50" alt="Song Image">
                 <div class="song-details">
                     <p class="song-name">Song 2</p>
                     <p>Artist 2</p>
-                </div>
-                <div class="song-actions">
-                    <i class="heart">&#x2665;</i>
-                    <i class="download">&#x1F4E5;</i>
                 </div>
             </div>
             <!-- Add more items as needed -->
@@ -252,7 +248,7 @@
             document.querySelector('.button-container').classList.remove('active');
             document.querySelector('.song-info').classList.add('active');
             document.querySelector('.audio-player').classList.add('active');
-            document.getElementById('up-next-container').style.transform = 'translateY(0)';
+            document.querySelector('.up-next-button').classList.add('active');
             fetchSongDetails();
         }
 
