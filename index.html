@@ -70,12 +70,12 @@
         }
 
         .song-image {
-            width: 200px;
-            height: 200px;
+            width: 250px;
+            height: 250px;
             border-radius: 50%;
             object-fit: cover;
             margin-bottom: 20px;
-            border: 4px solid #6a00f4;
+            border: 5px solid white;
         }
 
         .song-title {
@@ -90,6 +90,36 @@
 
         .audio-player {
             margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .progress-bar-container {
+            width: 90%;
+            max-width: 400px;
+            height: 8px;
+            background-color: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #6a00f4;
+            border-radius: 4px;
+        }
+
+        .audio-time {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 400px;
+            font-size: 14px;
+            color: #ccc;
         }
 
         .up-next {
@@ -108,9 +138,16 @@
         <div id="song-name" class="song-title">Loading...</div>
         <div id="singer" class="singer">Please wait</div>
     </div>
-    <audio id="audio-player" class="audio-player" controls>
-        Your browser does not support the audio element.
-    </audio>
+    <div class="audio-player">
+        <audio id="audio-player" src="" ontimeupdate="updateProgress()"></audio>
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div class="audio-time">
+            <span id="current-time">0:00</span>
+            <span id="total-time">0:00</span>
+        </div>
+    </div>
     <div id="up-next" class="up-next">
         Up Next: No songs in queue
     </div>
@@ -128,6 +165,8 @@
                 document.getElementById('song-image').src = data.Image;
                 document.getElementById('audio-player').src = data.Url;
 
+                document.getElementById('audio-player').play();
+
                 console.log('Song details loaded:', data);
             } catch (error) {
                 console.error('Error fetching song details:', error);
@@ -143,6 +182,24 @@
             document.querySelector('.audio-player').classList.add('active');
             document.getElementById('up-next').classList.add('active');
             fetchSongDetails();
+        }
+
+        function updateProgress() {
+            const audio = document.getElementById('audio-player');
+            const progressBar = document.getElementById('progress-bar');
+            const currentTime = document.getElementById('current-time');
+            const totalTime = document.getElementById('total-time');
+
+            const progressPercent = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            const minutes = Math.floor(audio.currentTime / 60);
+            const seconds = Math.floor(audio.currentTime % 60);
+            currentTime.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            const totalMinutes = Math.floor(audio.duration / 60);
+            const totalSeconds = Math.floor(audio.duration % 60);
+            totalTime.textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
         }
     </script>
 </body>
