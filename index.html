@@ -108,8 +108,19 @@
 
         function joinRoom() {
             logMessage('Fetching data...');
-            fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid')
-                .then(response => response.json())
+            fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     logMessage(`Data received: ${JSON.stringify(data)}`);
                     document.getElementById('song-image').src = data.Image;
@@ -130,7 +141,7 @@
                         logMessage('Error loading audio');
                     };
                 })
-                .catch(error => logMessage(`Error fetching song data: ${error}`));
+                .catch(error => logMessage(`Error fetching song data: ${error.message}`));
         }
 
         function startProgressBar(audio) {
