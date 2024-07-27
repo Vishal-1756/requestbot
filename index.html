@@ -65,6 +65,18 @@
         .join-room-btn:hover {
             background-color: #ff9a00;
         }
+
+        #logger {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            color: #ff7300;
+            text-align: left;
+            font-size: 14px;
+        }
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -81,15 +93,25 @@
             </div>
             <audio id="audio-player"></audio>
         </div>
+        <div id="logger"></div>
     </div>
 
     <script>
         window.Telegram.WebApp.ready();
 
+        function logMessage(message) {
+            const logger = document.getElementById('logger');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = message;
+            logger.appendChild(logEntry);
+        }
+
         function joinRoom() {
+            logMessage('Fetching data...');
             fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid')
                 .then(response => response.json())
                 .then(data => {
+                    logMessage(`Data received: ${JSON.stringify(data)}`);
                     document.getElementById('song-image').src = data.Image;
                     document.getElementById('song-name').textContent = data["Song name"];
                     document.getElementById('singer-name').textContent = data.Singer;
@@ -98,16 +120,17 @@
                     audioPlayer.src = data.Url;
 
                     audioPlayer.oncanplaythrough = () => {
+                        logMessage('Audio can play through.');
                         audioPlayer.play();
                         document.getElementById('song-details').style.display = 'block';
                         startProgressBar(audioPlayer);
                     };
 
                     audioPlayer.onerror = () => {
-                        console.error('Error loading audio');
+                        logMessage('Error loading audio');
                     };
                 })
-                .catch(error => console.error('Error fetching song data:', error));
+                .catch(error => logMessage(`Error fetching song data: ${error}`));
         }
 
         function startProgressBar(audio) {
