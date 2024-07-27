@@ -73,7 +73,7 @@
     <script>
         async function fetchSongDetails() {
             try {
-                const response = await fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid');
+                const response = await fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid%20');
                 const data = await response.json();
 
                 document.getElementById('song-name').textContent = data['Song name'];
