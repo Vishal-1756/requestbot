@@ -3,90 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motion Sensing Eyes</title>
+    <title>Telegram Music Player</title>
     <style>
         body, html {
-            height: 100%;
             margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f0f0;
-            cursor: none; /* Hide the cursor for better visual */
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
         }
-        .eyes {
-            display: flex;
-            gap: 50px;
+
+        .container {
+            text-align: center;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
         }
-        .eye {
-            width: 100px;
-            height: 150px;
-            background: white;
-            border: 4px solid black;
-            border-radius: 50% / 60%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+
+        .container img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .song-details {
+            margin: 20px 0;
+        }
+
+        .progress-bar-container {
+            background: #444;
+            border-radius: 5px;
             overflow: hidden;
-        }
-        .pupil {
-            width: 30px;
-            height: 40px;
-            background: black;
-            border-radius: 50%;
-            position: absolute;
-            transition: transform 0.05s ease; /* Faster movement for more natural look */
-        }
-        .tap {
-            position: absolute;
-            width: 10px;
             height: 10px;
-            background: red;
-            border-radius: 50%;
-            display: none;
-            pointer-events: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8);
+            animation: progress 0s linear forwards;
+        }
+
+        @keyframes progress {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        .join-room-btn {
+            padding: 10px 20px;
+            background-color: #ff7300;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .join-room-btn:hover {
+            background-color: #ff9a00;
         }
     </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="eyes">
-        <div class="eye">
-            <div class="pupil" id="left-pupil"></div>
-        </div>
-        <div class="eye">
-            <div class="pupil" id="right-pupil"></div>
+    <div class="container">
+        <h1>Telegram Music Player</h1>
+        <button class="join-room-btn" onclick="joinRoom()">Join Room</button>
+        <div class="song-details" id="song-details" style="display: none;">
+            <img id="song-image" src="" alt="Singer Image">
+            <h2 id="song-name">Song Name</h2>
+            <p id="singer-name">Singer</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <audio id="audio-player" style="display:none;"></audio>
         </div>
     </div>
-    <div class="tap" id="tap"></div>
 
     <script>
-        const pupils = document.querySelectorAll('.pupil');
-        const tapIndicator = document.getElementById('tap');
+        window.Telegram.WebApp.ready();
 
-        document.addEventListener("mousemove", (event) => {
-            const { clientX: mouseX, clientY: mouseY } = event;
-            pupils.forEach(pupil => {
-                const { left, top, width, height } = pupil.parentElement.getBoundingClientRect();
-                const eyeX = left + width / 2;
-                const eyeY = top + height / 2;
-                const angle = Math.atan2(mouseY - eyeY, mouseX - eyeX);
-                const maxMovementX = width / 4 - 10; // Limit movement
-                const maxMovementY = height / 4 - 10;
-                const x = Math.cos(angle) * maxMovementX;
-                const y = Math.sin(angle) * maxMovementY;
-                pupil.style.transform = `translate(${x}px, ${y}px)`;
-            });
-        });
+        function joinRoom() {
+            fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('song-image').src = data.Image;
+                    document.getElementById('song-name').textContent = data["Song name"];
+                    document.getElementById('singer-name').textContent = data.Singer;
 
-        document.addEventListener("click", (event) => {
-            tapIndicator.style.left = `${event.clientX - 5}px`;
-            tapIndicator.style.top = `${event.clientY - 5}px`;
-            tapIndicator.style.display = 'block';
-            setTimeout(() => {
-                tapIndicator.style.display = 'none';
-            }, 300);
-        });
+                    const audioPlayer = document.getElementById('audio-player');
+                    audioPlayer.src = data.Url;
+                    audioPlayer.play();
+
+                    audioPlayer.onloadedmetadata = function() {
+                        document.getElementById('progress-bar').style.animationDuration = `${audioPlayer.duration}s`;
+                        document.getElementById('progress-bar').style.animationPlayState = 'running';
+                    };
+
+                    document.getElementById('song-details').style.display = 'block';
+                })
+                .catch(error => console.error('Error fetching song data:', error));
+        }
     </script>
 </body>
 </html>
