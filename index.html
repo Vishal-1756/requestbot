@@ -107,37 +107,47 @@
         }
 
         function joinRoom() {
-            logMessage('Attempting to fetch data...');
-            fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid', { method: 'GET' })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP status ${response.status}`);
+            logMessage('Attempting to fetch data using XMLHttpRequest...');
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://ruby-music-api.onrender.com/song?song_name=Cupid', true);
+            
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            const data = JSON.parse(xhr.responseText);
+                            logMessage(`Data received: ${JSON.stringify(data)}`);
+                            document.getElementById('song-image').src = data.Image;
+                            document.getElementById('song-name').textContent = data["Song name"];
+                            document.getElementById('singer-name').textContent = data.Singer;
+
+                            const audioPlayer = document.getElementById('audio-player');
+                            audioPlayer.src = data.Url;
+
+                            audioPlayer.oncanplaythrough = () => {
+                                logMessage('Audio can play through.');
+                                audioPlayer.play();
+                                document.getElementById('song-details').style.display = 'block';
+                                startProgressBar(audioPlayer);
+                            };
+
+                            audioPlayer.onerror = () => {
+                                logMessage('Error loading audio');
+                            };
+                        } catch (e) {
+                            logMessage(`Error parsing response: ${e}`);
+                        }
+                    } else {
+                        logMessage(`HTTP error! status: ${xhr.status}`);
                     }
-                    return response.json();
-                })
-                .then(data => {
-                    logMessage(`Data received: ${JSON.stringify(data)}`);
-                    document.getElementById('song-image').src = data.Image;
-                    document.getElementById('song-name').textContent = data["Song name"];
-                    document.getElementById('singer-name').textContent = data.Singer;
+                }
+            };
 
-                    const audioPlayer = document.getElementById('audio-player');
-                    audioPlayer.src = data.Url;
+            xhr.onerror = function () {
+                logMessage('Network error or Cross-Origin Request Blocked.');
+            };
 
-                    audioPlayer.oncanplaythrough = () => {
-                        logMessage('Audio can play through.');
-                        audioPlayer.play();
-                        document.getElementById('song-details').style.display = 'block';
-                        startProgressBar(audioPlayer);
-                    };
-
-                    audioPlayer.onerror = () => {
-                        logMessage('Error loading audio');
-                    };
-                })
-                .catch(error => {
-                    logMessage(`Error fetching song data: ${error.message}`);
-                });
+            xhr.send();
         }
 
         function startProgressBar(audio) {
