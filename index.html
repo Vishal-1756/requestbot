@@ -116,13 +116,15 @@
         <div id="singer" class="singer">Please wait</div>
     </div>
     <div class="audio-player">
-        <audio id="audio-player" src="" ontimeupdate="updateProgress()"></audio>
+        <video id="audio-player" controls ontimeupdate="updateProgress()" style="display:none;">
+            Your browser does not support the video element.
+        </video>
         <div class="progress-bar-container">
             <div id="progress-bar" class="progress-bar"></div>
         </div>
         <div class="audio-time">
             <span id="current-time">0:00</span>
-            <span id="total-time">2:54</span>
+            <span id="total-time">0:00</span>
         </div>
     </div>
     <div id="up-next" class="up-next">
@@ -141,6 +143,9 @@
                 document.getElementById('singer').textContent = data.Singer;
                 document.getElementById('song-image').src = data.Image;
                 document.getElementById('audio-player').src = data.Url;
+
+                document.getElementById('audio-player').style.display = 'block';
+                document.getElementById('audio-player').play();
 
                 console.log('Song details loaded:', data);
             } catch (error) {
