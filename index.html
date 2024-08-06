@@ -187,7 +187,7 @@
         <div id="singer" class="singer">Please wait</div>
     </div>
     <div class="audio-player">
-        <video id="audio-player" ontimeupdate="updateProgress()" style="display:none;">
+        <video id="audio-player" ontimeupdate="updateProgress()" onended="fetchNextSong()" style="display:none;">
             Your browser does not support the video element.
         </video>
         <div class="progress-bar-container">
@@ -246,6 +246,33 @@
                 document.getElementById('song-name').textContent = 'Failed to load song';
                 document.getElementById('singer').textContent = 'Error fetching song data';
                 document.getElementById('song-image').alt = 'Error loading song image';
+                alert('No songs in the queue');
+            }
+        }
+
+        async function fetchNextSong() {
+            try {
+                const response = await fetch('https://ruby-music-api.onrender.com/current_queue');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.queue.length === 0) {
+                    alert('No songs in the queue');
+                    return;
+                }
+                const song = data.queue[0];
+
+                document.getElementById('song-name').textContent = song['Song name'];
+                document.getElementById('singer').textContent = song.Singer;
+                document.getElementById('song-image').src = song.Image;
+                document.getElementById('audio-player').src = song.Url;
+
+                document.getElementById('audio-player').play();
+                console.log('Next song loaded:', song);
+            } catch (error) {
+                console.error('Error fetching next song:', error);
+                alert('No songs in the queue');
             }
         }
 
