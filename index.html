@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Player</title>
     <style>
+        /* Styling */
         body {
             display: flex;
             flex-direction: column;
@@ -223,19 +224,23 @@
     <script>
         async function fetchSongDetails() {
             try {
-                const response = await fetch('https://ruby-music-api.onrender.com/song?song_name=Cupid');
+                const response = await fetch('https://ruby-music-api.onrender.com/current_queue');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
+                if (data.queue.length === 0) {
+                    throw new Error('No song in queue');
+                }
+                const song = data.queue[0];
 
-                document.getElementById('song-name').textContent = data['Song name'];
-                document.getElementById('singer').textContent = data.Singer;
-                document.getElementById('song-image').src = data.Image;
-                document.getElementById('audio-player').src = data.Url;
+                document.getElementById('song-name').textContent = song['Song name'];
+                document.getElementById('singer').textContent = song.Singer;
+                document.getElementById('song-image').src = song.Image;
+                document.getElementById('audio-player').src = song.Url;
 
                 document.getElementById('audio-player').play();
-                console.log('Song details loaded:', data);
+                console.log('Song details loaded:', song);
             } catch (error) {
                 console.error('Error fetching song details:', error);
                 document.getElementById('song-name').textContent = 'Failed to load song';
@@ -286,3 +291,4 @@
     </script>
 </body>
 </html>
+ 
